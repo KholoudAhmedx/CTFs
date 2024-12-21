@@ -9,18 +9,19 @@ e = 0x10001
 e_decimal = int(e)
 #print(f'{e_decimal}')
 
-# This equation -> (n1 * E) + n2
-# Solve it in terms of n2 -> /// n2 = value_of_equation - (n1 * E)
 value_of_equation = 601613204734044874510382122719388369424704454445440856955212747733856646787417730534645761871794607755794569926160226856377491672497901427125762773794612714954548970049734347216746397532291215057264241745928752782099454036635249993278807842576939476615587990343335792606509594080976599605315657632227121700808996847129758656266941422227113386647519604149159248887809688029519252391934671647670787874483702292498358573950359909165677642135389614863992438265717898239252246163
 
 # Solution?
 # Vulnerability: Duplicate prime used in n1 and n2 which in our case :q
-# gcd(n1,n2) = q, so we can compute gcd , to know what the value of q is
-# get the value of p (the second prime) = n1(given) // q, and you know get the both value of primes
-# You can easily crack the private key and get the flag
+# 1. Get value of n2 by using modulu properties
+# 2. Compute gcd(n1,n2),in this case gcd(n1,n2) = q
+# 3. Get the value of  remaining primes: p (the second prime) = n1(given) // q , z = n2 // q
+# 4. You can easily crack the private key and get the flag
+# Decryption equation : c^e mod (n) and private key (d) : e^-1 mod (phi(n))
 
-
-# Bruteforce value of E (failed solution)
+##### (Failed solution)
+# This equation -> (n1 * E) + n2
+# Solve it in terms of n2 -> /// n2 = value_of_equation - (n1 * E) and bruteforce value of E 
 # for E in range(1,100000):
 #     n2 = value_of_equation- (n1 * E)
 
@@ -34,7 +35,8 @@ value_of_equation = 601613204734044874510382122719388369424704454445440856955212
 #     # print(f'Value of n2 :{n2}')
 #     # Now that we have both n1 and q -> get p
 
-## To get n2 -> use modulu properties  (Successed solution)
+##### Successed solution
+## To get n2 -> use modulu properties  
 ### Take modoulu n1 of the two parts of the equation to get rid of multiples of n1 which is (n1 * E) part in the equation -: 
 ### ((n1 * E) + n2 ) % n1 = value_of_equation % n1
 ## By simplifying the terms: 
@@ -48,8 +50,6 @@ q = gcd(n1, n2)
 
 p = n1 // q
 z = n2 // q 
-# print(f'Value of p :{p}')
-# print(f'Value of z :{z}')
 
 
 # Compute totient function phi_n1 , phi_n2
@@ -57,24 +57,16 @@ phi_n1 = (p - 1)*(q - 1)
 phi_n2 = (z - 1)*(q - 1)
 
 
-# print(f'Value of phi_n1: {phi_n1}')
-# print(f'Value of phi_n2: {phi_n2}')
-
 # Compute private key d1 , d2
 d1 = pow(e_decimal,-1,phi_n1)
 d2 = pow(e_decimal, -1, phi_n2)
 
-# print(f'Value of d1: {d1}')
-# print(f'Value of d2: {d2}')
 
 # Decrypt c1 and c2 
 m1 = pow(c1, d1, n1)
 m2 = pow(c2, d2, n2)
 
-
-# print(f'Value of m1: {m1}')
-# print(f'Value of m2: {m2}')
-
+# Get the flag
 flag1 = long_to_bytes(m1)
 flag2 = long_to_bytes(m2)
 
